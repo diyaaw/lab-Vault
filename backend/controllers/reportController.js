@@ -121,7 +121,14 @@ exports.uploadReport = async (req, res) => {
                 { name: 'Platelets', regex: /Platelets[\s\S]{0,30}?(\d+)/i, normalMin: 150000, normalMax: 450000 },
                 { name: 'Hematocrit', regex: /Hematocrit[\s\S]{0,30}?(\d+\.?\d*)/i, normalMin: 40, normalMax: 50 },
                 { name: 'Glucose', regex: /(?:Glucose|Sugar)[\s\S]{0,30}?(\d+\.?\d*)/i, normalMin: 70, normalMax: 100 },
-                { name: 'Cholesterol', regex: /Cholesterol[\s\S]{0,30}?(\d+\.?\d*)/i, normalMin: 125, normalMax: 200 }
+                { name: 'Cholesterol', regex: /Cholesterol[\s\S]{0,30}?(\d+\.?\d*)/i, normalMin: 125, normalMax: 200 },
+                { name: 'Sodium', regex: /Sodium[\s\S]{0,30}?(\d+\.?\d*)/i, normalMin: 136, normalMax: 145 },
+                { name: 'Potassium', regex: /Potassium[\s\S]{0,30}?(\d+\.?\d*)/i, normalMin: 3.5, normalMax: 5.2 },
+                { name: 'Chloride', regex: /Chloride[\s\S]{0,30}?(\d+\.?\d*)/i, normalMin: 96, normalMax: 108 },
+                { name: 'Calcium', regex: /Calcium[\s\S]{0,30}?(\d+\.?\d*)/i, normalMin: 8.5, normalMax: 10.5 },
+                { name: 'Creatinine', regex: /Creatinine[\s\S]{0,30}?(\d+\.?\d*)/i, normalMin: 0.70, normalMax: 1.40 },
+                { name: 'Urea', regex: /(?:Urea)[\s\S]{0,30}?(\d+\.?\d*)/i, normalMin: 4, normalMax: 40 },
+                { name: 'Uric Acid', regex: /Uric Acid[\s\S]{0,30}?(\d+\.?\d*)/i, normalMin: 2.7, normalMax: 7.0 }
             ];
 
             let summaryParts = [];
@@ -137,16 +144,16 @@ exports.uploadReport = async (req, res) => {
                     extractedData[m.name] = value;
                     
                     if (status === 'normal') {
-                        summaryParts.push(`${m.name} (${value}) is in healthy range.`);
+                        summaryParts.push(`${m.name} (${value}) is in a healthy range.`);
                     } else {
-                        summaryParts.push(`${m.name} (${value}) is outside recommended levels. Consult your doctor.`);
+                        summaryParts.push(`${m.name} (${value}) is outside the recommended limits. It is best to discuss this with your doctor.`);
                     }
                 }
             });
 
             aiSummary = summaryParts.length > 0 
                 ? summaryParts.join(' ') 
-                : "Your report has been successfully processed. Most values appear to be in order, but please review with your physician for a full clinical assessment.";
+                : "Your report has been successfully processed. Most values appear to be in order, but please review with your doctor for a full assessment.";
 
             // Extract doctor comment if present
             const commentMatch = text.match(/Doctor Comment\s*[:\-]?\s*([^\n\r.]+)/i);

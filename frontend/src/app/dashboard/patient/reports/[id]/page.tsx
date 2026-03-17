@@ -94,9 +94,16 @@ export default function PatientReportViewerPage() {
             'Platelets': { min: 150000, max: 450000, unit: '/uL' },
             'Hematocrit': { min: 40, max: 50, unit: '%' },
             'Glucose': { min: 70, max: 100, unit: 'mg/dL' },
-            'Cholesterol': { min: 125, max: 200, unit: 'mg/dL' }
+            'Cholesterol': { min: 125, max: 200, unit: 'mg/dL' },
+            'Sodium': { min: 136, max: 145, unit: 'mEq/L' },
+            'Potassium': { min: 3.5, max: 5.2, unit: 'mEq/L' },
+            'Chloride': { min: 96, max: 108, unit: 'mEq/L' },
+            'Calcium': { min: 8.5, max: 10.5, unit: 'mg/dl' },
+            'Creatinine': { min: 0.70, max: 1.40, unit: 'mg/dl' },
+            'Urea': { min: 4, max: 40, unit: 'mg/dl' },
+            'Uric Acid': { min: 2.7, max: 7.0, unit: 'mg/dl' }
         };
-        const norm = norms[label] || { min: 0, max: 1000, unit: '' };
+        const norm = norms[label] || norms[Object.keys(norms).find(k => k.toLowerCase() === label.toLowerCase()) || ''] || { min: 0, max: 1000, unit: '' };
         return {
             label: label.toLowerCase(),
             value: value as number,

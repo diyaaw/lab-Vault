@@ -4,32 +4,29 @@ const path = require('path');
 const fs = require('fs');
 const { PDFParse } = require('pdf-parse');
 
-// Helper for localized medical explanations (Formal tone, no emojis)
+// Helper for localized medical explanations ( Layman terms, no emojis)
 const getLocalizedExplanation = (key, metric, value, lang, status = 'normal') => {
     const defaultLang = 'en';
     const templates = {
         en: {
-            hemoglobin: `Hemoglobin: Measured at ${value}. Hemoglobin is the protein in red blood cells responsible for oxygen transport throughout the body. Your current level is ${status === 'normal' ? 'within the standard reference range' : 'outside the recommended clinical range, which may require medical review'}.`,
-            wbc: `WBC Count: Measured at ${value}. White Blood Cells are essential components of the immune system. Your current count is ${status === 'normal' ? 'within stable physiological limits' : 'outside the typical reference range and should be discussed with a clinician'}.`,
-            rbc: `RBC Count: Measured at ${value}. Red Blood Cells are critical for maintaining systemic oxygenation. Your results are ${status === 'normal' ? 'within normal parameters' : 'outside the standard medical range'}.`,
-            platelets: `Platelets: Measured at ${value}. Platelets are necessary for proper blood coagulation and wound healing. Your level is ${status === 'normal' ? 'considered normal' : 'outside the reference range; clinical consultation is advised'}.`,
-            hematocrit: `Hematocrit: Measured at ${value}%. This represents the proportion of red blood cells in your total blood volume. Your level is ${status === 'normal' ? 'within the expected medical range' : 'outside standard reference limits'}.`,
-            glucose: `Blood Glucose: Measured at ${value}. This indicates the concentration of sugar in the blood, which serves as the primary energy source. Your level is ${status === 'normal' ? 'within the healthy fasting range' : 'outside the recommended glycemic limits'}.`,
-            cholesterol: `Cholesterol: Measured at ${value}. This measures the lipid levels in your bloodstream. Your results are ${status === 'normal' ? 'within the optimal clinical range' : 'associated with increased clinical risk; please consult a healthcare professional'}.`,
-            default: `${metric}: Measured at ${value}. This value is ${status === 'normal' ? 'within standard medical limits' : 'outside the target reference range. Professional consultation is recommended'}.`,
-            intro: `Clinical Summary of Test Results: `,
-            recommendation: `\n\nNote: These descriptions are for informational purposes. Please consult with a qualified healthcare professional to discuss these results within the context of your overall health.`,
-            no_metrics: `The system has processed your report. While the document is available for review, automated clinical metric extraction did not yield specific values for this summary.`
-        },
-        hi: {
-            hemoglobin: `हीमोग्लोबिन: आपका स्तर ${value} है। हीमोग्लोबिन रक्त में ऑक्सीजन के परिवहन के लिए जिम्मेदार प्रोटीन है। आपका वर्तमान स्तर ${status === 'normal' ? 'मानक संदर्भ सीमा के भीतर' : 'नैदानिक सीमा से बाहर'} है।`,
-            cholesterol: `कोलेस्ट्रॉल: आपका स्तर ${value} है। यह आपके रक्त प्रवाह में लिपिड के स्तर को मापता है। आपके परिणाम ${status === 'normal' ? 'इष्टतम नैदानिक सीमा के भीतर' : 'चिकित्सा परामर्श की आवश्यकता'} हैं।`,
-            wbc: `WBC काउंट: आपका स्तर ${value} है। श्वेत रक्त कोशिकाएं प्रतिरक्षा प्रणाली के आवश्यक घटक हैं। आपकी वर्तमान संख्या ${status === 'normal' ? 'स्थिर शारीरिक सीमा के भीतर' : 'चिकित्सा समीक्षा की आवश्यकता'} है।`,
-            glucose: `ब्लड ग्लूकोज: आपका स्तर ${value} है। यह रक्त में शर्करा की सांद्रता को दर्शाता है। आपका स्तर ${status === 'normal' ? 'स्वस्थ सीमा के भीतर' : 'अनुशंसित सीमा से बाहर'} है।`,
-            default: `${metric}: आपका स्तर ${value} है। यह ${status === 'normal' ? 'सामान्य सीमा के भीतर' : 'चिकित्सा परामर्श की आवश्यकता'} है।`,
-            intro: `परीक्षण परिणामों का नैदानिक सारांश: `,
-            recommendation: `\n\nनोट: ये विवरण केवल सूचना के उद्देश्यों के लिए हैं। कृपया अपने डॉक्टर से परामर्श करें।`,
-            no_metrics: `प्रणाली ने आपकी रिपोर्ट संसाधित कर दी है, लेकिन हम स्वचालित रूप से विशिष्ट डेटा नहीं निकाल सके।`
+            hemoglobin: `Hemoglobin: Measured at ${value}. Hemoglobin helps carry oxygen from your lungs to the rest of your body. Your current level is ${status === 'normal' ? 'within the normal range' : 'outside the typical range, which you should discuss with your doctor'}.`,
+            wbc: `WBC Count: Measured at ${value}. White Blood Cells are part of your immune system that helps fight infections. Your current count is ${status === 'normal' ? 'in a healthy range' : 'outside the usual range and may need medical review'}.`,
+            rbc: `RBC Count: Measured at ${value}. Red Blood Cells are important for carrying oxygen throughout your body. Your results are ${status === 'normal' ? 'within normal limits' : 'outside the standard range'}.`,
+            platelets: `Platelets: Measured at ${value}. Platelets help your blood clot to stop bleeding. Your level is ${status === 'normal' ? 'considered normal' : 'outside the reference range; a doctor can help explain what this means for you'}.`,
+            hematocrit: `Hematocrit: Measured at ${value}%. This shows how much of your blood is made up of red blood cells. Your level is ${status === 'normal' ? 'within the healthy range' : 'outside the standard limits'}.`,
+            glucose: `Blood Glucose: Measured at ${value}. This measures the sugar in your blood, which is your body's main source of energy. Your level is ${status === 'normal' ? 'within a healthy range' : 'outside the recommended limits'}.`,
+            cholesterol: `Cholesterol: Measured at ${value}. This measures fats in your blood. Your results are ${status === 'normal' ? 'within the healthy clinical range' : 'outside the ideal range; please consult your doctor about these results'}.`,
+            sodium: `Sodium: Measured at ${value}. Sodium helps balance water and salt in your body and helps your nerves and muscles work. Your level is ${status === 'normal' ? 'within the normal range' : 'outside the standard range'}.`,
+            potassium: `Potassium: Measured at ${value}. Potassium is important for your heart and muscle function. Your level is ${status === 'normal' ? 'within the normal range' : 'outside the standard range'}.`,
+            chloride: `Chloride: Measured at ${value}. Chloride helps maintain proper fluid balance in your body. Your results are ${status === 'normal' ? 'within normal limits' : 'outside the typical range'}.`,
+            calcium: `Calcium: Measured at ${value}. Calcium is vital for your bones, heart, and nerves. Your level is ${status === 'normal' ? 'considered healthy' : 'outside the reference range'}.`,
+            creatinine: `Creatinine: Measured at ${value}. This measures how well your kidneys are filtering your blood. Your level is ${status === 'normal' ? 'within the healthy range' : 'outside the typical clinical range'}.`,
+            urea: `Blood Urea: Measured at ${value}. This is a waste product filtered by your kidneys. Your level is ${status === 'normal' ? 'within normal limits' : 'outside the standard range'}.`,
+            uricacid: `Uric Acid: Measured at ${value}. High levels can sometimes lead to issues like gout. Your current level is ${status === 'normal' ? 'within the healthy range' : 'outside the recommended limits'}.`,
+            default: `${metric}: Measured at ${value}. This value is ${status === 'normal' ? 'within standard limits' : 'outside the target range. It is best to discuss this with your doctor'}.`,
+            intro: `Medical Summary of Your Results: `,
+            recommendation: `\n\nNote: These descriptions are for informational purposes. Please consult with your doctor to discuss these results in the context of your overall health.`,
+            no_metrics: `The system has processed your report. While the document is available for review, we couldn't automatically highlight specific numbers for this summary.`
         }
     };
 
@@ -129,7 +126,14 @@ exports.summarizeReport = async (req, res) => {
                         { name: 'Platelets', regex: /Platelets[\s\S]{0,30}?(\d+)/i, key: 'platelets' },
                         { name: 'Hematocrit', regex: /Hematocrit[\s\S]{0,30}?(\d+\.?\d*)/i, key: 'hematocrit' },
                         { name: 'Glucose', regex: /(?:Glucose|Sugar)[\s\S]{0,30}?(\d+\.?\d*)/i, key: 'glucose' },
-                        { name: 'Cholesterol', regex: /Cholesterol[\s\S]{0,30}?(\d+\.?\d*)/i, key: 'cholesterol' }
+                        { name: 'Cholesterol', regex: /Cholesterol[\s\S]{0,30}?(\d+\.?\d*)/i, key: 'cholesterol' },
+                        { name: 'Sodium', regex: /Sodium[\s\S]{0,30}?(\d+\.?\d*)/i, key: 'sodium' },
+                        { name: 'Potassium', regex: /Potassium[\s\S]{0,30}?(\d+\.?\d*)/i, key: 'potassium' },
+                        { name: 'Chloride', regex: /Chloride[\s\S]{0,30}?(\d+\.?\d*)/i, key: 'chloride' },
+                        { name: 'Calcium', regex: /Calcium[\s\S]{0,30}?(\d+\.?\d*)/i, key: 'calcium' },
+                        { name: 'Creatinine', regex: /Creatinine[\s\S]{0,30}?(\d+\.?\d*)/i, key: 'creatinine' },
+                        { name: 'Urea', regex: /(?:Urea)[\s\S]{0,30}?(\d+\.?\d*)/i, key: 'urea' },
+                        { name: 'Uric Acid', regex: /Uric Acid[\s\S]{0,30}?(\d+\.?\d*)/i, key: 'uricacid' }
                     ];
 
                     let extractedData = {};
@@ -151,6 +155,7 @@ exports.summarizeReport = async (req, res) => {
 
                     report.extractedData = extractedData;
                     report.ocrProcessed = true;
+                    report.rawText = text; // Store raw text for fallback summary
                 } catch (ocrErr) {
                     console.error('[DEBUG] PDFA/OCR extraction failed inner:', ocrErr.message);
                 }
@@ -164,12 +169,19 @@ exports.summarizeReport = async (req, res) => {
             platelets: { min: 150000, max: 450000 },
             hematocrit: { min: 40, max: 50 },
             glucose: { min: 70, max: 100 },
-            cholesterol: { min: 125, max: 200 }
+            cholesterol: { min: 125, max: 200 },
+            sodium: { min: 136, max: 145 },
+            potassium: { min: 3.5, max: 5.2 },
+            chloride: { min: 96, max: 108 },
+            calcium: { min: 8.5, max: 10.5 },
+            creatinine: { min: 0.70, max: 1.40 },
+            urea: { min: 4, max: 40 },
+            uricacid: { min: 2.7, max: 7.0 }
         };
 
         const templates = {
-            en: { intro: `Simplified Medical Analysis of `, recommendation: `\n\n💡 **Next Step:** While these notes help explain the terms, please talk to your doctor for a complete medical plan.`, no_metrics: `We recommend checking the original document for full details as we couldn't automatically highlight specific numbers.` },
-            hi: { intro: `नमस्ते! आपकी रिपोर्ट का सरल विश्लेषण: `, recommendation: `\n\n💡 **अगला कदम:** कृपया पूर्ण चिकित्सा योजना के लिए अपने डॉक्टर से बात करें।`, no_metrics: `कोई पहचान योग्य नैदानिक मेट्रिक्स नहीं मिला।` }
+            en: { intro: `Simplified Medical Analysis of `, recommendation: `\n\nNext Step: While these notes help explain the terms, please talk to your doctor for a complete medical plan.`, no_metrics: `We recommend checking the original document for full details as we couldn't automatically highlight specific numbers.` },
+            hi: { intro: `नमस्ते! आपकी रिपोर्ट का सरल विश्लेषण: `, recommendation: `\n\nअगला कदम: कृपया पूर्ण चिकित्सा योजना के लिए अपने डॉक्टर से बात करें।`, no_metrics: `कोई पहचान योग्य नैदानिक मेट्रिक्स नहीं मिला।` }
         };
 
         const t = templates[lang] || templates.en;
@@ -177,7 +189,11 @@ exports.summarizeReport = async (req, res) => {
         let summaryParts = [];
 
         if (!report.extractedData || Object.keys(report.extractedData || {}).length === 0) {
-            summaryText = t.no_metrics;
+            // Robust fallback for any report: Use a snippet or meaningful overview
+            const textSnippet = report.rawText ? report.rawText.substring(0, 300).replace(/\n/g, ' ') : '';
+            summaryText = textSnippet 
+                ? `We processed your report: ${textSnippet}... Please review the full document for all clinical details.`
+                : t.no_metrics;
         } else {
             Object.entries(report.extractedData).forEach(([name, value]) => {
                 const metricKey = name.toLowerCase();
