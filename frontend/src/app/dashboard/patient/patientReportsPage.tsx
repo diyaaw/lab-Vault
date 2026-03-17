@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import PatientReportCard from '@/components/patient/PatientReportCard';
 
@@ -60,9 +61,17 @@ export default function PatientReportsPage() {
     return (
         <div className="space-y-8 pb-12">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div>
-                    <h1 className="text-3xl font-black text-[#1F2933] tracking-tight">{t('reports')}</h1>
-                    <p className="text-[#6B7280] mt-1 text-lg font-medium tracking-tight">Access all your laboratory history in one place.</p>
+                <div className="flex items-center space-x-4 mb-4">
+                    <Link 
+                        href="/dashboard/patient" 
+                        className="p-3 bg-white border border-[#E2E8F0] rounded-2xl text-[#4F6F6F] hover:bg-[#F6F7F5] transition-all shadow-sm group/back"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover/back:-translate-x-1 transition-transform"><path d="m15 18-6-6 6-6"/></svg>
+                    </Link>
+                    <div>
+                        <h1 className="text-4xl font-black text-[#1F2933] tracking-tight mb-2">{t('reports')}</h1>
+                        <p className="text-[#6B7280] text-lg font-medium tracking-tight max-w-2xl">{t('reports_subtitle')}</p>
+                    </div>
                 </div>
                 <div className="flex items-center space-x-2">
                     <span className="text-xs font-black text-[#6B7280] uppercase tracking-widest bg-[#E2E8F0] px-3 py-1.5 rounded-lg">TOTAL: {mockReports.length}</span>

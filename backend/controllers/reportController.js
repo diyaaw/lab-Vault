@@ -152,7 +152,7 @@ exports.uploadReport = async (req, res) => {
             });
 
             aiSummary = summaryParts.length > 0 
-                ? summaryParts.join(' ') 
+                ? `### Initial Analysis\n\n• ${summaryParts.join('\n\n• ')}` 
                 : "Your report has been successfully processed. Most values appear to be in order, but please review with your doctor for a full assessment.";
 
             // Extract doctor comment if present

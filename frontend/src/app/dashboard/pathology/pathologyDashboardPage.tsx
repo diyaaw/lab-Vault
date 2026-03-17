@@ -124,6 +124,8 @@ export default function AdminDashboard() {
                                             <a
                                                 href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${report.fileUrl}`}
                                                 target="_blank"
+                                                rel="noopener noreferrer"
+                                                download={report.patientName ? `${report.patientName}_report.pdf` : 'report.pdf'}
                                                 className="text-[#4F6F6F] hover:text-[#8FB9A8] font-bold underline"
                                             >
                                                 View PDF

@@ -1,6 +1,7 @@
 {
     "dashboard": "Dashboard",
-    "reports": "Reports",
+    "reports": "Medical Reports",
+    "reports_subtitle": "Your complete diagnostic history and digital health records.",
     "healthInsights": "Health Insights",
     "totalReports": "Total Reports",
     "recentUploads": "Recent Uploads",
@@ -25,6 +26,13 @@
     "wbc": "WBC Count (Immunity)",
     "platelets": "Platelets (Clotting)",
     "hematocrit": "Hematocrit (Cell Proportion)",
+    "sodium": "Sodium (Water Balance)",
+    "potassium": "Potassium (Heart & Muscle)",
+    "chloride": "Chloride (Fluid Balance)",
+    "calcium": "Calcium (Bones & Heart)",
+    "creatinine": "Creatinine (Kidney Function)",
+    "urea": "Blood Urea (Waste Flow)",
+    "uricacid": "Uric Acid (Joint Health)",
     "noInsights": "No detailed clinical insights identified.",
     "selectLanguage": "Select Language",
     "profileStatus": "Profile Status",
@@ -43,5 +51,8 @@
     "generate": "Generate",
     "regenerate": "Regenerate",
     "analyzing": "Analyzing...",
-    "insights_pending": "AI Insights Pending processing"
+    "insights_pending": "AI Insights Pending processing",
+    "clinical_insight": "Clinical Insight",
+    "action_view": "View Report",
+    "action_download": "Download PDF"
 }

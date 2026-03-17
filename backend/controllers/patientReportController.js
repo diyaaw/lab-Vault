@@ -9,24 +9,35 @@ const getLocalizedExplanation = (key, metric, value, lang, status = 'normal') =>
     const defaultLang = 'en';
     const templates = {
         en: {
-            hemoglobin: `Hemoglobin: Measured at ${value}. Hemoglobin helps carry oxygen from your lungs to the rest of your body. Your current level is ${status === 'normal' ? 'within the normal range' : 'outside the typical range, which you should discuss with your doctor'}.`,
-            wbc: `WBC Count: Measured at ${value}. White Blood Cells are part of your immune system that helps fight infections. Your current count is ${status === 'normal' ? 'in a healthy range' : 'outside the usual range and may need medical review'}.`,
-            rbc: `RBC Count: Measured at ${value}. Red Blood Cells are important for carrying oxygen throughout your body. Your results are ${status === 'normal' ? 'within normal limits' : 'outside the standard range'}.`,
-            platelets: `Platelets: Measured at ${value}. Platelets help your blood clot to stop bleeding. Your level is ${status === 'normal' ? 'considered normal' : 'outside the reference range; a doctor can help explain what this means for you'}.`,
-            hematocrit: `Hematocrit: Measured at ${value}%. This shows how much of your blood is made up of red blood cells. Your level is ${status === 'normal' ? 'within the healthy range' : 'outside the standard limits'}.`,
-            glucose: `Blood Glucose: Measured at ${value}. This measures the sugar in your blood, which is your body's main source of energy. Your level is ${status === 'normal' ? 'within a healthy range' : 'outside the recommended limits'}.`,
-            cholesterol: `Cholesterol: Measured at ${value}. This measures fats in your blood. Your results are ${status === 'normal' ? 'within the healthy clinical range' : 'outside the ideal range; please consult your doctor about these results'}.`,
-            sodium: `Sodium: Measured at ${value}. Sodium helps balance water and salt in your body and helps your nerves and muscles work. Your level is ${status === 'normal' ? 'within the normal range' : 'outside the standard range'}.`,
-            potassium: `Potassium: Measured at ${value}. Potassium is important for your heart and muscle function. Your level is ${status === 'normal' ? 'within the normal range' : 'outside the standard range'}.`,
-            chloride: `Chloride: Measured at ${value}. Chloride helps maintain proper fluid balance in your body. Your results are ${status === 'normal' ? 'within normal limits' : 'outside the typical range'}.`,
-            calcium: `Calcium: Measured at ${value}. Calcium is vital for your bones, heart, and nerves. Your level is ${status === 'normal' ? 'considered healthy' : 'outside the reference range'}.`,
-            creatinine: `Creatinine: Measured at ${value}. This measures how well your kidneys are filtering your blood. Your level is ${status === 'normal' ? 'within the healthy range' : 'outside the typical clinical range'}.`,
-            urea: `Blood Urea: Measured at ${value}. This is a waste product filtered by your kidneys. Your level is ${status === 'normal' ? 'within normal limits' : 'outside the standard range'}.`,
-            uricacid: `Uric Acid: Measured at ${value}. High levels can sometimes lead to issues like gout. Your current level is ${status === 'normal' ? 'within the healthy range' : 'outside the recommended limits'}.`,
-            default: `${metric}: Measured at ${value}. This value is ${status === 'normal' ? 'within standard limits' : 'outside the target range. It is best to discuss this with your doctor'}.`,
-            intro: `Medical Summary of Your Results: `,
-            recommendation: `\n\nNote: These descriptions are for informational purposes. Please consult with your doctor to discuss these results in the context of your overall health.`,
+            hemoglobin: `Your Hemoglobin is ${value}. Think of hemoglobin as the tiny delivery trucks in your blood that carry oxygen to your whole body. ${status === 'normal' ? "Great news—your levels are right where they should be!" : "It's slightly outside the usual range, but don't worry—it's just something to chat with your doctor about during your next visit."}`,
+            wbc: `Your White Blood Cell (WBC) count is ${value}. These are your body's brave little soldiers that fight off infections. ${status === 'normal' ? "Your immune system looks nice and strong!" : "The count is a bit different from the standard, so it's a good idea to let your doctor take a look."}`,
+            rbc: `Your Red Blood Cell (RBC) count is ${value}. These cells are essential for keeping your energy up by moving oxygen around. ${status === 'normal' ? "Everything looks perfectly normal here." : "This is a bit outside the typical range, which is worth a quick mention to your healthcare provider."}`,
+            platelets: `Your Platelet count is ${value}. Platelets are what help your body heal by stopping any bleeding. ${status === 'normal' ? "Your body's healing system is working beautifully." : "Your levels are a bit unusual, so your doctor can help explain what that means for you specifically."}`,
+            hematocrit: `Your Hematocrit level is ${value}%. This just measures how much of your blood is made of those important red cells. ${status === 'normal' ? "You're in a very healthy range!" : "It's slightly off the standard mark, but your doctor can help you understand why."}`,
+            glucose: `Your Blood Glucose (sugar) is ${value}. This is the fuel that gives you energy throughout the day. ${status === 'normal' ? "Your energy levels are looking well-balanced!" : "The number is a bit high or low, so it might be worth discussing your diet or energy with your doctor."}`,
+            cholesterol: `Your Cholesterol is ${value}. These are the fats in your blood that we like to keep an eye on for your heart health. ${status === 'normal' ? "Your heart seems to be in great shape!" : "It’s a bit outside the ideal range, but there are lots of simple ways to manage this with your doctor's guidance."}`,
+            sodium: `Your Sodium level is ${value}. Sodium helps keep your body's water and salt in perfect balance. ${status === 'normal' ? "Your balance looks excellent!" : "It's a bit different from the usual, so it's something your doctor can help monitor."}`,
+            potassium: `Your Potassium is ${value}. This is a key mineral that keeps your heart and muscles working smoothly. ${status === 'normal' ? "Your levels are looking very healthy." : "It's a bit outside the typical range, so let's keep an eye on it with your doctor."}`,
+            chloride: `Your Chloride level is ${value}. This helps maintain the right fluid balance in your system. ${status === 'normal' ? "Everything is in great balance!" : "The results are a little unusual, but your doctor can clarify this for you."}`,
+            calcium: `Your Calcium is ${value}. This is the building block for your strong bones and healthy nerves. ${status === 'normal' ? "Your bones and nerves are getting exactly what they need!" : "Your level is a bit different than expected, so it's worth a quick discussion."}`,
+            creatinine: `Your Creatinine level is ${value}. This tells us how well your kidneys are doing their important job of filtering your blood. ${status === 'normal' ? "Your kidneys are working wonderfully!" : "The number is a bit outside the typical clinical range, which is a good reason to touch base with your doctor."}`,
+            urea: `Your Blood Urea is ${value}. This is just a waste product your kidneys help clear out. ${status === 'normal' ? "Your levels are perfectly normal." : "It's a bit outside the usual range, so your doctor might want to take a closer look."}`,
+            uricacid: `Your Uric Acid is ${value}. Keeping this in balance helps prevent things like joint discomfort. ${status === 'normal' ? "Your levels are in a great spot!" : "It's slightly outside the recommended range, so your doctor can help you with a plan."}`,
+            default: `Your ${metric} is ${value}. ${status === 'normal' ? "This is within the healthy range!" : "This is a bit outside the target range, so it's best to have a friendly chat with your doctor about it."}`,
+            intro: `Medical Highlights from Your `,
+            recommendation: `Always consult with your doctor to discuss these results in the context of your overall clinical history.`,
             no_metrics: `The system has processed your report. While the document is available for review, we couldn't automatically highlight specific numbers for this summary.`
+        },
+        hi: {
+            hemoglobin: `आपका हीमोग्लोबिन ${value} है। हीमोग्लोबिन आपके शरीर में ऑक्सीजन पहुँचाने का काम करता है। ${status === 'normal' ? "खुशखबरी! आपका स्तर बिल्कुल सही है।" : "यह सामान्य से थोड़ा कम या ज्यादा है, डरो मत—बस अगली बार अपने डॉक्टर को दिखा लें।"}`,
+            cholesterol: `आपका कोलेस्ट्रॉल ${value} है। यह आपके दिल की सेहत के लिए महत्वपूर्ण है। ${status === 'normal' ? "आपका दिल बहुत स्वस्थ लग रहा है!" : "यह आदर्श सीमा से थोड़ा बाहर है, लेकिन सही खान-पान से इसे आसानी से ठीक किया जा सकता है।"}`,
+            wbc: `आपका WBC काउंट ${value} है। ये कोशिकाएं आपको बीमारियों से बचाती हैं। ${status === 'normal' ? "आपकी रोग प्रतिरोधक क्षमता बहुत अच्छी है!" : "यह थोड़ा अलग है, इसलिए डॉक्टर से एक बार बात करना अच्छा रहेगा।"}`,
+            glucose: `आपका ब्लड ग्लूकोज ${value} है। यह आपको दिन भर ऊर्जा देता है। ${status === 'normal' ? "आपकी ऊर्जा का स्तर बहुत अच्छा है!" : "यह थोड़ा कम या ज्यादा है, तो अपने खान-पान के बारे में डॉक्टर से सलाह लें।"}`,
+            creatinine: `आपका क्रेयटिनिन ${value} है। यह बताता है कि आपकी किडनी कितनी अच्छी तरह काम कर रही है। ${status === 'normal' ? "आपकी किडनी बहुत अच्छे से काम कर रही है!" : "यह सामान्य सीमा से थोड़ा बाहर है, तो एक बार डॉक्टर को जरूर दिखाएं।"}`,
+            default: `आपका ${metric} स्तर ${value} है। ${status === 'normal' ? "यह बिल्कुल सामान्य है!" : "यह थोड़ा अलग है, तो डॉक्टर से सलाह लेना बेहतर होगा।"}`,
+            intro: `आपकी रिपोर्ट का सरल विश्लेषण: `,
+            recommendation: `\n\nनोट: ये विवरण केवल सूचना के लिए हैं। कृपया अपने डॉक्टर से परामर्श करें।`,
+            no_metrics: `प्रणाली ने आपकी रिपोर्ट संसाधित कर दी है, लेकिन हम स्वचालित रूप से विशिष्ट डेटा नहीं निकाल सके।`
         }
     };
 
@@ -179,33 +190,41 @@ exports.summarizeReport = async (req, res) => {
             uricacid: { min: 2.7, max: 7.0 }
         };
 
-        const templates = {
-            en: { intro: `Simplified Medical Analysis of `, recommendation: `\n\nNext Step: While these notes help explain the terms, please talk to your doctor for a complete medical plan.`, no_metrics: `We recommend checking the original document for full details as we couldn't automatically highlight specific numbers.` },
-            hi: { intro: `नमस्ते! आपकी रिपोर्ट का सरल विश्लेषण: `, recommendation: `\n\nअगला कदम: कृपया पूर्ण चिकित्सा योजना के लिए अपने डॉक्टर से बात करें।`, no_metrics: `कोई पहचान योग्य नैदानिक मेट्रिक्स नहीं मिला।` }
-        };
-
-        const t = templates[lang] || templates.en;
-        let summaryText = "";
-        let summaryParts = [];
-
-        if (!report.extractedData || Object.keys(report.extractedData || {}).length === 0) {
-            // Robust fallback for any report: Use a snippet or meaningful overview
-            const textSnippet = report.rawText ? report.rawText.substring(0, 300).replace(/\n/g, ' ') : '';
-            summaryText = textSnippet 
-                ? `We processed your report: ${textSnippet}... Please review the full document for all clinical details.`
-                : t.no_metrics;
-        } else {
-            Object.entries(report.extractedData).forEach(([name, value]) => {
-                const metricKey = name.toLowerCase();
-                const norm = metricNorms[metricKey];
-                const status = (norm && (value < norm.min || value > norm.max)) ? 'abnormal' : 'normal';
-                
-                summaryParts.push(getLocalizedExplanation(metricKey, name, value, lang, status));
-            });
-            
-            const intro = lang === 'hi' ? t.intro : `${t.intro}${report.reportName || 'Report'}:\n\n`;
-            summaryText = intro + summaryParts.join("\n\n") + t.recommendation;
+    const templates = {
+        en: { 
+            intro: `Hello! I've thoughtfully analyzed your report for `, 
+            recommendation: `You're doing a great job by staying on top of your health! These notes are here to guide you, but remember that you're more than just these numbers. For a personalized plan that fits your unique lifestyle, I encourage you to share this summary with your doctor. They'll love seeing how proactive you're being!`, 
+            no_metrics: `I've looked through your report, and while I didn't find specific numbers to highlight right now, your proactive approach to health is wonderful. Feel free to check the full document for all the details!` 
+        },
+        hi: { 
+            intro: `नमस्ते! मैंने आपकी इस रिपोर्ट का बड़े ध्यान से विश्लेषण किया है: `, 
+            recommendation: `आप अपनी सेहत का ख्याल रख रहे हैं, यह बहुत अच्छी बात है! ये विवरण आपकी समझ के लिए हैं, लेकिन याद रखें कि आपकी सेहत सिर्फ इन आंकड़ों से कहीं ज्यादा है। व्यक्तिगत सलाह के लिए कृपया इसे अपने डॉक्टर के साथ साझा करें। वे आपकी इस जागरूकता की सराहना करेंगे!`, 
+            no_metrics: `मैंने आपकी रिपोर्ट देखी है, और हालांकि अभी कोई विशेष आंकड़े नहीं मिले, पर आपकी यह सजगता काबिले तारीफ है। आप पूरी जानकारी के लिए मूल दस्तावेज़ देख सकते हैं।` 
         }
+    };
+
+    const t = templates[lang] || templates.en;
+    let summaryText = "";
+    let summaryParts = [];
+
+    if (!report.extractedData || Object.keys(report.extractedData || {}).length === 0) {
+        // Robust fallback for any report: Use a snippet or meaningful overview
+        const textSnippet = report.rawText ? report.rawText.substring(0, 300).replace(/\n/g, ' ') : '';
+        summaryText = textSnippet 
+            ? `Report Overview: We processed your report: ${textSnippet}... Please review the full document for all clinical details.`
+            : t.no_metrics;
+    } else {
+        Object.entries(report.extractedData).forEach(([name, value]) => {
+            const metricKey = name.toLowerCase();
+            const norm = metricNorms[metricKey];
+            const status = (norm && (value < norm.min || value > norm.max)) ? 'abnormal' : 'normal';
+            
+            summaryParts.push(`${getLocalizedExplanation(metricKey, name, value, lang, status)}`);
+        });
+        
+        const intro = lang === 'hi' ? `${t.intro}\n\n` : `${t.intro}${report.reportName || 'Clinical Analysis'}\n\n`;
+        summaryText = intro + summaryParts.join("\n\n") + `\n\nRecommendation: ${t.recommendation}`;
+    }
  
         // Always save if we extracted new data during this call or forced
         const hasExtractedData = Object.keys(report.extractedData || {}).length > 0;

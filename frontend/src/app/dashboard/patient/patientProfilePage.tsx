@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/lib/AuthContext';
 
@@ -16,9 +17,21 @@ export default function PatientProfilePage() {
 
     return (
         <div className="space-y-8 pb-12">
-            <div>
-                <h1 className="text-3xl font-black text-[#1F2933] tracking-tight">Patient Profile</h1>
-                <p className="text-[#6B7280] mt-1 text-lg font-medium tracking-tight">Manage your personal information and preferences.</p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                <div>
+                    <div className="flex items-center space-x-4 mb-4">
+                        <Link 
+                            href="/dashboard/patient" 
+                            className="p-3 bg-white border border-[#E2E8F0] rounded-2xl text-[#4F6F6F] hover:bg-[#F6F7F5] transition-all shadow-sm group/back"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover/back:-translate-x-1 transition-transform"><path d="m15 18-6-6 6-6"/></svg>
+                        </Link>
+                        <div>
+                            <h1 className="text-4xl font-black text-[#1F2933] tracking-tight">Profile Settings</h1>
+                            <p className="text-[#6B7280] font-medium tracking-tight mt-1">LV-{user?.id?.substring(0, 8) || 'MEMBER'}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

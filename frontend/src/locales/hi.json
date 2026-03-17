@@ -1,6 +1,7 @@
 {
     "dashboard": "डैशबोर्ड",
-    "reports": "रिपोर्ट्स",
+    "reports": "मेडिकल रिपोर्ट्स",
+    "reports_subtitle": "आपका संपूर्ण नैदानिक इतिहास और डिजिटल स्वास्थ्य रिकॉर्ड।",
     "healthInsights": "स्वास्थ्य अंतर्दृष्टि",
     "totalReports": "कुल रिपोर्ट्स",
     "recentUploads": "हालिया अपलोड",
@@ -21,6 +22,13 @@
     "hemoglobin": "हीमोग्लोबिन",
     "cholesterol": "कोलेस्ट्रॉल",
     "glucose": "ग्लूकोज",
+    "sodium": "सोडियम",
+    "potassium": "पोटेशियम",
+    "chloride": "क्लोराइड",
+    "calcium": "कैल्शियम",
+    "creatinine": "क्रेयटिनिन",
+    "urea": "यूरिया",
+    "uricacid": "यूरिक एसिड",
     "selectLanguage": "भाषा चुनें",
     "profileStatus": "प्रोफ़ाइल स्थिति",
     "verifiedPatient": "सत्यापित रोगी",
@@ -38,5 +46,8 @@
     "generate": "बनाएं",
     "regenerate": "फिर से बनाएं",
     "analyzing": "विश्लेषण हो रहा है...",
-    "insights_pending": "AI अंतर्दृष्टि लंबित है"
+    "insights_pending": "AI अंतर्दृष्टि लंबित है",
+    "clinical_insight": "चिकित्सा अंतर्दृष्टि",
+    "action_view": "रिपोर्ट देखें",
+    "action_download": "पीडीएफ डाउनलोड करें"
 }
