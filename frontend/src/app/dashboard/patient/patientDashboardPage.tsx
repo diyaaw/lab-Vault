@@ -8,6 +8,7 @@ import PatientReportCard from '@/components/patient/PatientReportCard';
 import { reportService } from '@/services/reportService';
 import { Report } from '@/types';
 import Link from 'next/link';
+import AccessManagement from '@/components/patient/features/AccessManagement';
 
 export default function PatientDashboardPage() {
     const { t } = useLanguage();
@@ -169,6 +170,10 @@ export default function PatientDashboardPage() {
                 </div>
             </div>
 
+            {/* Access Management Section */}
+            <div className="mt-12">
+                <AccessManagement />
+            </div>
         </div>
     );
 }

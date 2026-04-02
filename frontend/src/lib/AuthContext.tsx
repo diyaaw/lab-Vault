@@ -33,8 +33,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         const verifySession = async () => {
-            const token = localStorage.getItem('token');
+            const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+            
             if (!token) {
+                console.log('[AUTH] No session token found');
+                setUser(null);
                 setLoading(false);
                 return;
             }
@@ -49,16 +52,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
                 if (res.ok) {
                     const userData = await res.json();
-                    // Normalize ID and Role
                     const id = userData.id || userData._id;
                     const role = userData.role === 'admin' ? 'pathology' : userData.role;
                     setUser({ ...userData, id, role });
                 } else {
+                    console.warn('[AUTH] Session verification failed, status:', res.status);
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');
+                    setUser(null);
                 }
             } catch (err) {
-                console.error('Session verification failed', err);
+                console.error('[AUTH] Session verification error:', err);
+                // On critical network errors, we don't automatically clear the session 
+                // but we should ensure the user state is null if not verified
+                setUser(null);
             } finally {
                 setLoading(false);
             }
@@ -67,8 +74,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         verifySession();
     }, []);
 
+    const getDashboardRoute = (role: string, mustChangePassword?: boolean) => {
+        if (mustChangePassword) return '/dashboard/change-password';
+        if (role === 'pathology') return '/dashboard/pathology';
+        if (role === 'doctor') return '/dashboard/doctor';
+        return '/dashboard/patient';
+    };
+
     const login = (userData: any, token: string) => {
-        // Map legacy 'admin' role to 'pathology' and normalize ID
         const id = userData.id || userData._id;
         const role = userData.role === 'admin' ? 'pathology' : userData.role;
         const normalizedUser = { ...userData, id, role };
@@ -77,23 +90,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem('token', token);
         setUser(normalizedUser);
 
-        // Redirect based on security flag or role
-        if (userData.mustChangePassword) {
-            router.push('/dashboard/change-password');
-        } else if (role === 'pathology') {
-            router.push('/dashboard/pathology');
-        } else if (role === 'doctor') {
-            router.push('/dashboard/doctor');
-        } else {
-            router.push('/dashboard/patient');
-        }
+        router.replace(getDashboardRoute(role, userData.mustChangePassword));
     };
 
     const logout = () => {
         localStorage.removeItem('user');
         localStorage.removeItem('token');
         setUser(null);
-        router.push('/login');
+        router.replace('/login');
     };
 
     return (

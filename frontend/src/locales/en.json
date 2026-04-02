@@ -54,5 +54,6 @@
     "insights_pending": "AI Insights Pending processing",
     "clinical_insight": "Clinical Insight",
     "action_view": "View Report",
-    "action_download": "Download PDF"
+    "action_download": "Download PDF",
+    "view_insights": "View Insights"
 }

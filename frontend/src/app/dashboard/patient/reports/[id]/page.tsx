@@ -234,29 +234,7 @@ export default function PatientReportViewerPage() {
                         </div>
                     </div>
 
-                    <div className="bg-gradient-to-br from-[#4F6F6F] to-[#2D3E3E] p-8 rounded-[40px] shadow-2xl text-white border border-[#4F6F6F]/20 relative overflow-hidden group">
-                        <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-colors duration-700"></div>
-                        <div className="flex items-center space-x-3 mb-6 relative z-10">
-                            <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-xl border border-white/20 shadow-inner">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                            </div>
-                            <div>
-                                <h3 className="text-xl font-black tracking-tight">AI Health Summary</h3>
-                                <p className="text-[10px] font-bold text-white/50 uppercase tracking-[0.2em] mt-0.5">Clinical Intelligence</p>
-                            </div>
-                        </div>
-                        <div className="bg-black/10 p-7 rounded-[32px] border border-white/10 backdrop-blur-md shadow-inner relative z-10">
-                            <div className="text-sm font-medium leading-loose text-white/90 prose prose-invert max-w-none prose-p:my-2 prose-li:my-1 prose-headings:text-white prose-headings:mb-4 prose-hr:border-white/10">
-                                {report.aiSummary ? (
-                                    <div className="whitespace-pre-line">
-                                        {report.aiSummary}
-                                    </div>
-                                ) : (
-                                    <p className="italic text-white/60">Automated analysis is being generated to help you understand your results. Please consult your physician for a full assessment.</p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
+
 
                     {report.doctorComment && (
                         <div className="bg-white p-8 rounded-[40px] shadow-sm border border-[#E2E8F0] animate-in slide-in-from-bottom-4 duration-700">

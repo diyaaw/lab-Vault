@@ -7,6 +7,8 @@ import { useLanguage } from '@/context/LanguageContext';
 import Link from 'next/link';
 import HealthInsightCard from '@/components/patient/HealthInsightCard';
 import VoiceSummaryButton from '@/components/patient/VoiceSummaryButton';
+import HealthTimeline from '@/components/patient/HealthTimeline';
+import ActionableNextSteps from '@/components/patient/ActionableNextSteps';
 import { getMetricConfig } from '@/utils/clinicalMetrics';
 
 export default function PatientHealthInsightsPage() {
@@ -160,8 +162,27 @@ export default function PatientHealthInsightsPage() {
                                                         </p>
                                                     </div>
                                                 )}
+
+                                                <ActionableNextSteps 
+                                                    steps={[
+                                                        { icon: "💧", text: "Stay hydrated with 8 glasses of water today" },
+                                                        { icon: "🥗", text: "Include more leafy greens in your next meal" },
+                                                        { icon: "🚶", text: "A gentle 15-minute walk will boost your energy" }
+                                                    ]} 
+                                                />
                                             </div>
                                         </div>
+
+                                        <HealthTimeline 
+                                            label="hemoglobin" 
+                                            unit="g/dL" 
+                                            status="improving"
+                                            data={[
+                                                { date: "2024-01-01", value: 12.1 },
+                                                { date: "2024-02-01", value: 12.8 },
+                                                { date: "2024-03-01", value: 13.4 }
+                                            ]}
+                                        />
                                     </div>
                                 )}
 

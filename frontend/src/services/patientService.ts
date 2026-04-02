@@ -21,5 +21,17 @@ export const patientService = {
     deletePatient: async (id: string): Promise<any> => {
         const res = await api.delete(`/patients/${id}`);
         return res.data;
+    },
+    grantAccess: async (doctorId: string, reportId: string | null = null): Promise<any> => {
+        const res = await api.post('/access/grant', { doctorId, reportId });
+        return res.data;
+    },
+    revokeAccess: async (doctorId: string, reportId: string | null = null): Promise<any> => {
+        const res = await api.post('/access/revoke', { doctorId, reportId });
+        return res.data;
+    },
+    getAccessList: async (): Promise<any[]> => {
+        const res = await api.get('/access/list');
+        return res.data;
     }
 };

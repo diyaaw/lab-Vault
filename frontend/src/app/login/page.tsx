@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/AuthContext';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 export default function LoginPage() {
@@ -11,7 +12,20 @@ export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const { login } = useAuth();
+    const { login, user, loading } = useAuth();
+    const router = useRouter();
+
+    // Redirect already-logged-in users away from login page
+    useEffect(() => {
+        if (!loading && user) {
+            const routes: Record<string, string> = {
+                pathology: '/dashboard/pathology',
+                doctor: '/dashboard/doctor',
+                patient: '/dashboard/patient',
+            };
+            router.replace(routes[user.role] || '/dashboard/patient');
+        }
+    }, [user, loading, router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

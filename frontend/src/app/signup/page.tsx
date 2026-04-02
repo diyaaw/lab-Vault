@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/AuthContext';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 export default function SignupPage() {
@@ -16,7 +17,20 @@ export default function SignupPage() {
     const [passwordStrength, setPasswordStrength] = useState(0);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const { login } = useAuth();
+    const { login, user, loading } = useAuth();
+    const router = useRouter();
+
+    // Redirect already-logged-in users away from signup page
+    useEffect(() => {
+        if (!loading && user) {
+            const routes: Record<string, string> = {
+                pathology: '/dashboard/pathology',
+                doctor: '/dashboard/doctor',
+                patient: '/dashboard/patient',
+            };
+            router.replace(routes[user.role] || '/dashboard/patient');
+        }
+    }, [user, loading, router]);
 
     useEffect(() => {
         const password = formData.password;
