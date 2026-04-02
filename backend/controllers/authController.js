@@ -19,13 +19,19 @@ exports.signup = async (req, res) => {
         user = new User({ name, email, password, role });
         await user.save();
 
-        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET || 'secret', {
+        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET || 'labvault_secret_2024_secure', {
             expiresIn: '30d',
         });
 
         res.status(201).json({
             token,
-            user: { id: user._id, name: user.name, email: user.email, role: user.role },
+            user: { 
+                id: user._id, 
+                name: user.name, 
+                email: user.email, 
+                role: user.role,
+                patientCustomId: user.patientCustomId 
+            },
         });
     } catch (error) {
         console.error('Signup error:', error);
@@ -40,7 +46,7 @@ exports.login = async (req, res) => {
         const user = await User.findOne({ email });
 
         if (user && (await user.comparePassword(password))) {
-            const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET || 'secret', {
+            const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET || 'labvault_secret_2024_secure', {
                 expiresIn: '30d',
             });
 
@@ -56,6 +62,8 @@ exports.login = async (req, res) => {
                     gender: user.gender,
                     bloodGroup: user.bloodGroup,
                     address: user.address,
+                    patientCustomId: user.patientCustomId,
+                    grantedDoctors: user.grantedDoctors,
                     mustChangePassword: user.mustChangePassword 
                 },
             });

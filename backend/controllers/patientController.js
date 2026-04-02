@@ -28,12 +28,16 @@ exports.searchPatients = async (req, res) => {
                 $or: [
                     { name: { $regex: query, $options: 'i' } },
                     { email: { $regex: query, $options: 'i' } },
-                    { phone: { $regex: query, $options: 'i' } }
+                    { phone: { $regex: query, $options: 'i' } },
+                    { patientCustomId: { $regex: query, $options: 'i' } }
                 ]
             });
         }
 
-        const patients = await User.find(searchQuery).limit(10).select('name email phone age gender createdAt');
+        const patients = await User.find(searchQuery)
+            .limit(10)
+            .select('name email phone age gender patientCustomId createdAt');
+        
         console.log(`[SEARCH] Found: ${patients.length} patients`);
         res.json(patients);
     } catch (error) {
@@ -97,6 +101,7 @@ exports.registerPatient = async (req, res) => {
                 _id: user._id,
                 name: user.name,
                 email: user.email,
+                patientCustomId: user.patientCustomId,
                 tempPassword // Returning for convenience in dev/testing if email fails
             }
         });
@@ -138,5 +143,62 @@ exports.deletePatient = async (req, res) => {
         res.json({ message: 'Patient deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Error deleting patient', error: error.message });
+    }
+};
+// Grant access to a doctor
+exports.grantAccessToDoctor = async (req, res) => {
+    try {
+        const { doctorId } = req.body;
+        const patientId = req.user.id;
+
+        if (!doctorId) return res.status(400).json({ message: 'Doctor ID is required' });
+
+        const patient = await User.findById(patientId);
+        if (!patient || patient.role !== 'patient') {
+            return res.status(404).json({ message: 'Patient not found' });
+        }
+
+        if (patient.grantedDoctors.includes(doctorId)) {
+            return res.status(400).json({ message: 'Access already granted to this doctor' });
+        }
+
+        patient.grantedDoctors.push(doctorId);
+        await patient.save();
+
+        res.json({ message: 'Access granted to doctor successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error granting access', error: error.message });
+    }
+};
+
+// Revoke access from a doctor
+exports.revokeAccessFromDoctor = async (req, res) => {
+    try {
+        const { doctorId } = req.body;
+        const patientId = req.user.id;
+
+        const patient = await User.findById(patientId);
+        if (!patient) return res.status(404).json({ message: 'Patient not found' });
+
+        patient.grantedDoctors = patient.grantedDoctors.filter(id => id.toString() !== doctorId);
+        await patient.save();
+
+        res.json({ message: 'Access revoked from doctor successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error revoking access', error: error.message });
+    }
+};
+
+// Get granted doctors for a patient
+exports.getGrantedDoctors = async (req, res) => {
+    try {
+        const patientId = req.user.id;
+        const patient = await User.findById(patientId).populate('grantedDoctors', 'name email specialization phone');
+        
+        if (!patient) return res.status(404).json({ message: 'Patient not found' });
+        
+        res.json(patient.grantedDoctors);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching granted doctors', error: error.message });
     }
 };

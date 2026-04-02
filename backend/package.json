@@ -7,15 +7,22 @@
     "start": "node server.js"
   },
   "dependencies": {
+    "3": "^2.1.0",
+    "@google/generative-ai": "^0.24.1",
+    "axios": "^1.7.9",
     "bcryptjs": "^3.0.3",
+    "check": "^1.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "groq-sdk": "^1.1.2",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.2.4",
     "multer": "^2.1.1",
     "nodemailer": "^8.0.2",
+    "openai": "^4.86.1",
     "pdf-parse": "^2.4.5",
+    "status": "^0.0.13",
     "tesseract.js": "^7.0.0"
   },
   "devDependencies": {

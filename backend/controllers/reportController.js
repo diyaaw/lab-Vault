@@ -4,6 +4,58 @@ const fs = require('fs');
 const User = require('../models/User');
 const Report = require('../models/Report');
 const { PDFParse } = require('pdf-parse');
+const Groq = require('groq-sdk');
+const Tesseract = require('tesseract.js');
+
+// Initialize Groq client
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+/**
+ * AI Analysis using Groq (Llama 3 70B)
+ * Extracts medical data in JSON and generates a professional, patient-friendly summary.
+ */
+const analyzeReportWithAI = async (ocrText) => {
+    try {
+        const response = await groq.chat.completions.create({
+            model: "llama-3.3-70b-versatile",
+            messages: [
+                {
+                    role: "system",
+                    content: `You are a professional medical report analyzer for LabVault. 
+                    Your goal is to extract clinical metrics from a lab report and provide helpful insights.
+
+                    1. EXTRACT DATA: Find all recorded medical metrics (e.g., Hemoglobin, Glucose, WBC, etc.) and their numerical values. 
+                    2. FORMAT: Return data in a strict JSON format.
+                    3. SUMMARY: Write a supportive, empathetic, and professional summary of the findings.
+                       - Explain status in simple terms (e.g., "Normal", "High", "Low").
+                       - Use a reassuring tone.
+                       - Always include: "This analysis is for information only. Please consult your doctor for a formal diagnosis."
+                    
+                    RESPONSE FORMAT:
+                    {
+                        "extractedData": { "MetricName": value, ... },
+                        "summary": "Your detailed, empathetic summary here (Markdown supported)"
+                    }`
+                },
+                { role: "user", content: `Analyze this medical text and extract data: \n\n${ocrText}` }
+            ],
+            response_format: { type: "json_object" }, 
+            temperature: 0.2
+        });
+
+        const result = JSON.parse(response.choices[0].message.content);
+        return {
+            extractedData: result.extractedData || {},
+            aiSummary: result.summary || "Analysis successful. Please review with your healthcare provider."
+        };
+    } catch (error) {
+        console.error('[AI ANALYSIS ERROR]:', error.message);
+        return {
+            extractedData: {},
+            aiSummary: "We couldn't automatically analyze all details of your report, but our system has verified its completion. Please check the clinical metrics below and discuss them with your doctor."
+        };
+    }
+};
 
 // Get all reports for the logged-in pathology admin
 exports.getReports = async (req, res) => {
@@ -14,9 +66,12 @@ exports.getReports = async (req, res) => {
 
         if (search) {
             console.log(`[DEBUG] Searching for: ${search}`);
-            // Find reports where the reportName matches search or find patients by name
+            // Find reports by report name OR find patients by name/ID
             const patientIds = await User.find({
-                name: { $regex: search, $options: 'i' },
+                $or: [
+                    { name: { $regex: search, $options: 'i' } },
+                    { patientCustomId: { $regex: search, $options: 'i' } }
+                ],
                 role: 'patient'
             }).distinct('_id');
 
@@ -65,8 +120,6 @@ exports.getReportById = async (req, res) => {
     }
 };
 
-const Tesseract = require('tesseract.js');
-
 // Upload a new report
 exports.uploadReport = async (req, res) => {
     try {
@@ -76,15 +129,24 @@ exports.uploadReport = async (req, res) => {
             return res.status(400).json({ message: 'No file uploaded' });
         }
 
-        // Verify patient exists
-        const patient = await User.findOne({ _id: patientId, role: 'patient' });
-        if (!patient) {
-            return res.status(404).json({ message: 'Patient not found' });
+        // Verify patient exists using either internal ID or Custom ID
+        let patient;
+        if (mongoose.Types.ObjectId.isValid(patientId)) {
+            patient = await User.findOne({ _id: patientId, role: 'patient' });
         }
+        
+        if (!patient) {
+            patient = await User.findOne({ patientCustomId: patientId, role: 'patient' });
+        }
+
+        if (!patient) {
+            return res.status(404).json({ message: `Patient with ID "${patientId}" not found` });
+        }
+
+        const internalPatientId = patient._id;
 
         const filePath = path.join(__dirname, '..', 'uploads', 'reports', req.file.filename);
         
-        // --- OCR & AI INSIGHTS LOGIC ---
         let extractedData = {};
         let aiSummary = '';
         let ocrProcessed = false;
@@ -104,70 +166,34 @@ exports.uploadReport = async (req, res) => {
                     console.error('[DEBUG] PDF Extraction Error:', pdfErr.message);
                     throw pdfErr;
                 }
-                ocrProcessed = true;
             } else {
                 const dataBuffer = fs.readFileSync(filePath);
                 const { data: { text: ocrText } } = await Tesseract.recognize(dataBuffer, 'eng');
                 text = ocrText || '';
                 console.log(`[DEBUG] OCR Extraction Success. Text length: ${text.length}`);
-                ocrProcessed = true;
             }
+
+            // --- AI ANALYSIS WITH GROQ ---
+            console.log(`[DEBUG] Starting AI Analysis with Groq for report...`);
+            const analysis = await analyzeReportWithAI(text);
             
-            // Apply regex extraction to the extracted text
-            const metrics = [
-                { name: 'Hemoglobin', regex: /Hemoglobin[\s\S]{0,30}?(\d+\.?\d*)/i, normalMin: 13.5, normalMax: 17.5 },
-                { name: 'WBC', regex: /(?:WBC|White Blood Cell)[\s\S]{0,30}?(\d+\.?\d*)/i, normalMin: 4000, normalMax: 11000 },
-                { name: 'RBC', regex: /(?:RBC|Red Blood Cell)[\s\S]{0,30}?(\d+\.?\d*)/i, normalMin: 4.5, normalMax: 5.9 },
-                { name: 'Platelets', regex: /Platelets[\s\S]{0,30}?(\d+)/i, normalMin: 150000, normalMax: 450000 },
-                { name: 'Hematocrit', regex: /Hematocrit[\s\S]{0,30}?(\d+\.?\d*)/i, normalMin: 40, normalMax: 50 },
-                { name: 'Glucose', regex: /(?:Glucose|Sugar)[\s\S]{0,30}?(\d+\.?\d*)/i, normalMin: 70, normalMax: 100 },
-                { name: 'Cholesterol', regex: /Cholesterol[\s\S]{0,30}?(\d+\.?\d*)/i, normalMin: 125, normalMax: 200 },
-                { name: 'Sodium', regex: /Sodium[\s\S]{0,30}?(\d+\.?\d*)/i, normalMin: 136, normalMax: 145 },
-                { name: 'Potassium', regex: /Potassium[\s\S]{0,30}?(\d+\.?\d*)/i, normalMin: 3.5, normalMax: 5.2 },
-                { name: 'Chloride', regex: /Chloride[\s\S]{0,30}?(\d+\.?\d*)/i, normalMin: 96, normalMax: 108 },
-                { name: 'Calcium', regex: /Calcium[\s\S]{0,30}?(\d+\.?\d*)/i, normalMin: 8.5, normalMax: 10.5 },
-                { name: 'Creatinine', regex: /Creatinine[\s\S]{0,30}?(\d+\.?\d*)/i, normalMin: 0.70, normalMax: 1.40 },
-                { name: 'Urea', regex: /(?:Urea)[\s\S]{0,30}?(\d+\.?\d*)/i, normalMin: 4, normalMax: 40 },
-                { name: 'Uric Acid', regex: /Uric Acid[\s\S]{0,30}?(\d+\.?\d*)/i, normalMin: 2.7, normalMax: 7.0 }
-            ];
+            extractedData = analysis.extractedData;
+            aiSummary = analysis.aiSummary;
+            ocrProcessed = true;
 
-            let summaryParts = [];
-            metrics.forEach(m => {
-                const match = text.match(m.regex);
-                if (match) {
-                    let value = parseFloat(match[1]);
-                    // Normalize units (handle thousands)
-                    if (m.name === 'WBC' && value < 50) value *= 1000;
-                    if (m.name === 'Platelets' && value < 1000) value *= 1000;
-
-                    const status = (value >= m.normalMin && value <= m.normalMax) ? 'normal' : 'abnormal';
-                    extractedData[m.name] = value;
-                    
-                    if (status === 'normal') {
-                        summaryParts.push(`${m.name} (${value}) is in a healthy range.`);
-                    } else {
-                        summaryParts.push(`${m.name} (${value}) is outside the recommended limits. It is best to discuss this with your doctor.`);
-                    }
-                }
-            });
-
-            aiSummary = summaryParts.length > 0 
-                ? `### Initial Analysis\n\n• ${summaryParts.join('\n\n• ')}` 
-                : "Your report has been successfully processed. Most values appear to be in order, but please review with your doctor for a full assessment.";
-
-            // Extract doctor comment if present
-            const commentMatch = text.match(/Doctor Comment\s*[:\-]?\s*([^\n\r.]+)/i);
-            if (commentMatch) {
-                extractedData.doctorComment = commentMatch[1].trim();
+            // Simple doctor comment extraction fallback
+            if (!extractedData.doctorComment) {
+                const commentMatch = text.match(/Doctor Comment\s*[:\-]?\s*([^\n\r.]+)/i);
+                if (commentMatch) extractedData.doctorComment = commentMatch[1].trim();
             }
 
         } catch (ocrError) {
             console.error('Report processing failed:', ocrError);
-            aiSummary = 'We could not automatically extract your data, but your doctor has verified the report as ready to view.';
+            aiSummary = 'We could not automatically extract your data, but your report is ready to view. Please consult your doctor for a detailed analysis.';
         }
 
         const reportData = {
-            patientId,
+            patientId: internalPatientId,
             pathologyId: req.user.id,
             reportName,
             testType,

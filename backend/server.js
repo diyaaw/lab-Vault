@@ -24,6 +24,8 @@ app.use('/api/dashboard', require('./routes/dashboardRoutes'));
 app.use('/api/pathology/analytics', require('./routes/analyticsRoutes'));
 app.use('/api/patient/reports', require('./routes/patientReportRoutes'));
 app.use('/api/doctor', require('./routes/doctorRoutes')); // Management routes
+app.use('/api/access', require('./routes/accessRoutes'));
+app.use('/api/voice', require('./routes/voiceRoutes'));
 
 // Serve uploads folder
 const path = require('path');

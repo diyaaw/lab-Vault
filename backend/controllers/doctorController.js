@@ -1,4 +1,6 @@
 const User = require('../models/User');
+const AccessControl = require('../models/AccessControl');
+const Report = require('../models/Report');
 const sendEmail = require('../services/emailService');
 
 exports.getDoctors = async (req, res) => {
@@ -95,5 +97,69 @@ exports.deleteDoctor = async (req, res) => {
         res.json({ message: 'Doctor deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Error deleting doctor', error: error.message });
+    }
+};
+// Get patients who have granted access to this doctor
+exports.getMyPatients = async (req, res) => {
+    try {
+        const doctorId = req.user.id;
+        
+        // Find all active access control entries for this doctor
+        const accessEntries = await AccessControl.find({
+            doctorId,
+            accessGranted: true
+        }).distinct('patientId');
+
+        const patients = await User.find({
+            _id: { $in: accessEntries },
+            role: 'patient'
+        }).select('name email phone age gender patientCustomId createdAt');
+
+        res.json(patients);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching authorized patients', error: error.message });
+    }
+};
+
+// Get reports for an authorized patient
+exports.getPatientReportsForDoctor = async (req, res) => {
+    try {
+        const { patientId } = req.params;
+        const doctorId = req.user.id;
+
+        // 1. Check if global access is granted
+        const globalAccess = await AccessControl.findOne({
+            patientId,
+            doctorId,
+            reportId: null,
+            accessGranted: true
+        });
+
+        let reports;
+        if (globalAccess) {
+            // If global access, doctor can see all reports for this patient
+            reports = await Report.find({ patientId }).sort({ uploadDate: -1 });
+        } else {
+            // 2. Check for specific report access
+            const specificAccessEntries = await AccessControl.find({
+                patientId,
+                doctorId,
+                reportId: { $ne: null },
+                accessGranted: true
+            }).distinct('reportId');
+
+            if (specificAccessEntries.length === 0) {
+                return res.status(403).json({ message: 'Access denied. Patient has not granted you access to any reports.' });
+            }
+
+            reports = await Report.find({
+                _id: { $in: specificAccessEntries },
+                patientId
+            }).sort({ uploadDate: -1 });
+        }
+
+        res.json(reports);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching patient reports', error: error.message });
     }
 };
