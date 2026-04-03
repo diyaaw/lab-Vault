@@ -6,11 +6,10 @@ exports.signup = async (req, res) => {
     try {
         const { name, email, password, role } = req.body;
 
-        // Restriction: Only Pathology can use public signup
-        if (role !== 'pathology') {
-            return res.status(403).json({ 
-                message: 'Accounts for doctors and patients are created by pathology administrators.' 
-            });
+        // Ensure role is valid
+        const validRoles = ['patient', 'doctor', 'pathology'];
+        if (!validRoles.includes(role)) {
+            return res.status(400).json({ message: 'Invalid role selected.' });
         }
 
         let user = await User.findOne({ email });
