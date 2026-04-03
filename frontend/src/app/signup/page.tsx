@@ -11,7 +11,7 @@ export default function SignupPage() {
         name: '',
         email: '',
         password: '',
-        role: 'pathology',
+        role: 'patient',
     });
     const [showPassword, setShowPassword] = useState(false);
     const [passwordStrength, setPasswordStrength] = useState(0);
@@ -130,10 +130,6 @@ export default function SignupPage() {
                         </div>
                     )}
 
-                    <div className="mb-6 p-4 bg-emerald-50 border-l-4 border-[#8FB9A8] text-[#4F6F6F] text-sm rounded-r-xl font-medium">
-                        <span className="font-bold block mb-1">Note for Patients & Doctors</span>
-                        Accounts for doctors and patients are created by pathology administrators. If you are a patient or doctor, please contact your laboratory for login credentials.
-                    </div>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="floating-label-group">
@@ -207,6 +203,8 @@ export default function SignupPage() {
                                 value={formData.role}
                                 onChange={handleChange}
                             >
+                                <option value="patient">Patient / Individual</option>
+                                <option value="doctor">Medical Doctor</option>
                                 <option value="pathology">Pathology Administrator</option>
                             </select>
                             <label htmlFor="role">Your Role</label>
